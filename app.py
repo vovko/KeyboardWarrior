@@ -19,7 +19,10 @@ red_half_visible = (255, 0, 0, 0)
 grey=(125, 125, 125)
 
 screen = pygame.display.set_mode(size)
+pygame.display.set_caption("Keyboard Warrior")
+
 clock = pygame.time.Clock()
+
 
 class Boom:
     last_time = 0
