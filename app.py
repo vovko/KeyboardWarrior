@@ -134,6 +134,23 @@ def render_keyboard_input_counter(key_count):
 def current_time():
     return round(time.time() * 1000)
 
+def render_combo_timer(start_timestamp):
+    seconds = (current_time() - start_timestamp)/1000
+    max_width = 100
+    distance = max_width - (seconds)*10
+
+    if distance < 1:
+        return
+
+
+    start_x = 10
+
+
+
+    combo_duration = 10
+
+    pygame.draw.rect(screen, RED, (start_x, 100, distance, 10), 0)
+
 booms = []
 last_change = 0
 key_count = 0
@@ -159,6 +176,7 @@ while 1:
 
     render_last_keyboard_input(timer_start)
     render_keyboard_input_counter(key_count)
+    render_combo_timer(timer_start)
 
 
 
