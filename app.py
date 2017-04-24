@@ -7,7 +7,7 @@ import random
 
 pygame.init()
 
-WIDTH = 400
+WIDTH = 800
 HEIGHT = 200
 
 size = (WIDTH, HEIGHT)
@@ -91,14 +91,54 @@ def read_changes_from_log():
     path_to_file = root_path() + '/keylogger/log/keys.log'
     return os.stat(path_to_file).st_mtime
 
-def show_read_change(timestamp):
-    myfont = pygame.font.SysFont("monospace", 15)
-    label = myfont.render(str(int(timestamp)), 1, (255,255,255))
-    screen.blit(label, (100, 100))
 
+def render_last_keyboard_input(start_timestamp):
+    myfont = pygame.font.Font(root_path() + '/assets/bignoodletoo.ttf', 50)
+
+    one_minute = 60
+    one_hour = one_minute * 60
+
+    seconds = (current_time() - start_timestamp)/1000
+    hours = int(seconds / 3600)
+    minutes = int(seconds / 60)
+    leftover = round(seconds - (3600*hours) - (60*minutes), 3)
+
+    # pdb.set_trace()
+
+    if hours > 0:
+        hours_str = "{}h ".format(hours)
+    else:
+        hours_str = ""
+
+    if minutes > 0:
+        minutes_str = "{}m ".format(minutes)
+    else:
+        minutes_str = ""
+
+
+    since_formatted = "{}{}{}".format(hours_str, minutes_str, leftover)
+
+
+    time_passed = "Since last keyboard input: " + since_formatted
+
+    label = myfont.render(time_passed, 1, (255,255,255))
+    screen.blit(label, (10, 10))
+
+def render_keyboard_input_counter(key_count):
+    myfont = pygame.font.Font(root_path() + '/assets/bignoodletoo.ttf', 25)
+    key_count_label = "Key count: {:,}".format(key_count)
+
+    label = myfont.render(key_count_label, 1, (255,255,255))
+    screen.blit(label, (10, 60))
+
+def current_time():
+    return round(time.time() * 1000)
 
 booms = []
 last_change = 0
+key_count = 0
+
+timer_start = current_time()
 
 while 1:
     time.sleep(0.01)
@@ -111,11 +151,16 @@ while 1:
     show_frame_rate(clock.get_fps())
 
     file_change = read_changes_from_log()
-    show_read_change(file_change)
-
 
     if (file_change > last_change):
+        key_count += 1
         booms.append(Boom(screen, (int(random.uniform(0, WIDTH)), int(random.uniform(0, HEIGHT)))))
+        timer_start = current_time()
+
+    render_last_keyboard_input(timer_start)
+    render_keyboard_input_counter(key_count)
+
+
 
     for i, boom in enumerate(booms):
         if boom.running == False:
