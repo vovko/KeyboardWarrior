@@ -25,9 +25,10 @@ size = (WIDTH, HEIGHT)
 
 
 RED = (255,0,0)
-black = (0, 0, 0)
+BLACK = (0, 0, 0)
 red_half_visible = (255, 0, 0, 0)
 grey=(125, 125, 125)
+GREEN=(0,100,0)
 
 # KEYBOARD KEYS
 Q_KEY = 113
@@ -147,22 +148,58 @@ def render_keyboard_input_counter(key_count):
 def current_time():
     return round(time.time() * 1000)
 
+pie_start = 0
+
 def render_combo_timer(start_timestamp):
     seconds = (current_time() - start_timestamp)/1000
-    max_width = 100
-    distance = max_width - (seconds)*10
+    max_width = 360
+    step_size = max_width - (seconds)*100
 
-    if distance < 1:
+    if step_size < 1:
         return
 
+    # TODO: implement radial loader, cicle would constanty fill and can be restarted
+
+    # draw cicle
+    # MASK it or draw a triangle over it with narrow angle at the centre of circle
+
+    # Draw many triangles to fill the circle eventually
 
     start_x = 10
+
+    # pygame.draw.circle(screen, RED, (50, 50), 45, 5)
+    out_circle_x = 200
+    out_circle_y = 200
+    out_circle_r = 50
+
+    # pygame.gfxdraw.filled_circle(screen, out_circle_x, out_circle_y, out_circle_r, RED)
+    # pygame.gfxdraw.aacircle(screen, out_circle_x, out_circle_y, out_circle_r, RED)
+
+    # pygame.gfxdraw.filled_trigon(screen, )
+    # pie = pygame.gfxdraw.pie(screen, out_circle_x, out_circle_y, out_circle_r, 0, int(step_size), pygame.Color(255, 255, 255, 100))
+
+    # pdb.set_trace()
+
+    left = pygame.Surface((out_circle_r*2, out_circle_r*2), pygame.SRCALPHA)
+    pygame.gfxdraw.filled_circle(left, out_circle_r, out_circle_r, out_circle_r, RED)
+    screen.blit(left, (200, 200))
+
+    right = pygame.Surface((out_circle_r*2, out_circle_r*2), pygame.SRCALPHA)
+    pygame.gfxdraw.filled_circle(right, out_circle_r, out_circle_r, out_circle_r, GREEN)
+    screen.blit(right, (250, 200))
+
+
+    # pygame.gfxdraw.aacircle(screen, self.position[0], self.position[1], self.radius, self.color)
+    # pygame.gfxdraw.filled_circle(screen, self.position[0], self.position[1], self.radius, self.color)
+
+
+    # Lets mask one cicle out of another just for a simple test
 
 
 
     combo_duration = 10
 
-    pygame.draw.rect(screen, RED, (start_x, 100, distance, 10), 0)
+    pygame.draw.rect(screen, RED, (start_x, 100, step_size, 10), 0)
 
 booms = []
 last_change = 0
@@ -185,7 +222,7 @@ while 1:
         if event.type == pygame.QUIT: sys.exit()
 
     clock.tick()
-    screen.fill(black)
+    screen.fill(BLACK)
 
     show_frame_rate(clock.get_fps())
 
