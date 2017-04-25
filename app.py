@@ -4,11 +4,22 @@ import pdb
 import os
 import time
 import random
+import subprocess
+
+## Start keylogger
+
+
+def root_path():
+    return os.path.dirname(os.path.realpath(__file__))
+
+# pdb.set_trace()
+subprocess.call(["sudo", "{}/keylogger/start.sh".format(root_path())])
+
 
 pygame.init()
 
 WIDTH = 800
-HEIGHT = 200
+HEIGHT = 400
 
 size = (WIDTH, HEIGHT)
 
@@ -18,11 +29,15 @@ black = (0, 0, 0)
 red_half_visible = (255, 0, 0, 0)
 grey=(125, 125, 125)
 
-screen = pygame.display.set_mode(size)
+# KEYBOARD KEYS
+Q_KEY = 113
+F_KEY = 102
+
+screen = pygame.display.set_mode(size, pygame.RESIZABLE)
+# screen = pygame.display.set_mode(size)
 pygame.display.set_caption("Keyboard Warrior")
 
 clock = pygame.time.Clock()
-
 
 class Boom:
     last_time = 0
@@ -67,8 +82,6 @@ class Boom:
 
         self.radius += 5
 
-def root_path():
-    return os.path.dirname(os.path.realpath(__file__))
 
 def show_frame_rate(fps):
     padding = 2
@@ -160,6 +173,15 @@ timer_start = current_time()
 while 1:
     time.sleep(0.01)
     for event in pygame.event.get():
+        if event.type == pygame.KEYUP:
+            if event.key == Q_KEY:
+                sys.exit()
+
+            # Fullscreen acts strange in Ubuntu
+            # if event.key == F_KEY:
+            #     pygame.display.toggle_fullscreen()
+
+
         if event.type == pygame.QUIT: sys.exit()
 
     clock.tick()
@@ -177,7 +199,6 @@ while 1:
     render_last_keyboard_input(timer_start)
     render_keyboard_input_counter(key_count)
     render_combo_timer(timer_start)
-
 
 
     for i, boom in enumerate(booms):
