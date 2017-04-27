@@ -149,24 +149,45 @@ def current_time():
 pie_start = 0
 
 
-def fill_arc(surface, center, radius, theta0, theta1, color, ndiv=360):
+def fill_arc(surface, center, radius, theta0, theta1, color, ndiv=5):
     x0, y0 = center
 
     dtheta = (theta1 - theta0) / ndiv
-    angles = [theta0 + i*dtheta for i in range(ndiv + 1)]
+    angles = [theta0 - i*dtheta for i in range(ndiv + 1)]
 
     points = [(x0 + radius * math.cos(math.radians(theta)), y0 - radius * math.sin(math.radians(theta))) for theta in angles]
-
     for pair in points:
-        # pygame.gfxdraw.filled_trigon(surface, x0, y0, int(pair[0]), int(pair[1]), int(pair[0]+1), int(pair[1]), color)
-        pygame.gfxdraw.line(surface, x0, y0, int(pair[0]), int(pair[1]), RED)
+        pygame.draw.line(surface, RED, (x0, y0),(int(pair[0]), int(pair[1])), 3)
+
+    # To smooth the endge of the pie, draw aaline at the place of the last few points(reduced)
+    # pygame.draw.aaline(surface, RED, (x0, y0), (points[-1][0], points[-1][1]), 1)
+
+def render_filled_pie(surface, center, radius, value, color):
+    #KEK
+    if int(value) == 0:
+        value = 1
+
+    max_value = 100
+    start_angle = 90
+    max_angle = 360
+
+    # pdb.set_trace()
+    # print(int(value))
+
+    value_angle = start_angle + (value * max_angle/max_value)
+
+    fill_arc(surface, center, radius, start_angle, value_angle, color, int(value) * 5)
 
 def render_combo_timer(start_timestamp):
     seconds = (current_time() - start_timestamp)/1000
+
     max_width = 360
     step_size = max_width - (seconds)*100
+    radial_step_size = (seconds * 50)
 
-    fill_arc( screen, (200,200), 100, 0, step_size, RED )
+    # pdb.set_trace()
+
+    render_filled_pie( screen, (200,200), 100, radial_step_size, RED )
 
     if step_size < 1:
         return
