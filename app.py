@@ -5,10 +5,9 @@ import os
 import time
 import random
 import subprocess
+import math
 
 ## Start keylogger
-
-
 def root_path():
     return os.path.dirname(os.path.realpath(__file__))
 
@@ -27,7 +26,7 @@ size = (WIDTH, HEIGHT)
 RED = (255,0,0)
 BLACK = (0, 0, 0)
 red_half_visible = (255, 0, 0, 0)
-grey=(125, 125, 125)
+GRAY=(125, 125, 125)
 GREEN=(0,100,0)
 
 # KEYBOARD KEYS
@@ -93,7 +92,7 @@ def show_frame_rate(fps):
 
     # print("fps:", fps)
     myfont = pygame.font.SysFont("monospace", 15)
-    pygame.draw.rect(screen, grey, (box_x, box_y, box_width, box_height), 0)
+    pygame.draw.rect(screen, GRAY, (box_x, box_y, box_width, box_height), 0)
 
 
     # render text
@@ -117,8 +116,8 @@ def render_last_keyboard_input(start_timestamp):
     minutes = int(seconds / 60)
     leftover = round(seconds - (3600*hours) - (60*minutes), 3)
 
-    # pdb.set_trace()
-
+    # TODO: Refactor this using adequate date formatter
+    # Current lazy implementation breaks after long period of time
     if hours > 0:
         hours_str = "{}h ".format(hours)
     else:
@@ -128,7 +127,6 @@ def render_last_keyboard_input(start_timestamp):
         minutes_str = "{}m ".format(minutes)
     else:
         minutes_str = ""
-
 
     since_formatted = "{}{}{}".format(hours_str, minutes_str, leftover)
 
@@ -150,62 +148,56 @@ def current_time():
 
 pie_start = 0
 
+
+def fill_arc(surface, center, radius, theta0, theta1, color, ndiv=360):
+    x0, y0 = center
+
+    dtheta = (theta1 - theta0) / ndiv
+    angles = [theta0 + i*dtheta for i in range(ndiv + 1)]
+
+    points = [(x0 + radius * math.cos(math.radians(theta)), y0 - radius * math.sin(math.radians(theta))) for theta in angles]
+
+    for pair in points:
+        # pygame.gfxdraw.filled_trigon(surface, x0, y0, int(pair[0]), int(pair[1]), int(pair[0]+1), int(pair[1]), color)
+        pygame.gfxdraw.line(surface, x0, y0, int(pair[0]), int(pair[1]), RED)
+
 def render_combo_timer(start_timestamp):
     seconds = (current_time() - start_timestamp)/1000
     max_width = 360
     step_size = max_width - (seconds)*100
 
+    fill_arc( screen, (200,200), 100, 0, step_size, RED )
+
     if step_size < 1:
         return
 
-    # TODO: implement radial loader, cicle would constanty fill and can be restarted
-
-    # draw cicle
-    # MASK it or draw a triangle over it with narrow angle at the centre of circle
-
-    # Draw many triangles to fill the circle eventually
-
     start_x = 10
 
-    # pygame.draw.circle(screen, RED, (50, 50), 45, 5)
     out_circle_x = 200
     out_circle_y = 200
     out_circle_r = 50
 
-    # pygame.gfxdraw.filled_circle(screen, out_circle_x, out_circle_y, out_circle_r, RED)
-    # pygame.gfxdraw.aacircle(screen, out_circle_x, out_circle_y, out_circle_r, RED)
-
-    # pygame.gfxdraw.filled_trigon(screen, )
-    # pie = pygame.gfxdraw.pie(screen, out_circle_x, out_circle_y, out_circle_r, 0, int(step_size), pygame.Color(255, 255, 255, 100))
-
-    # pdb.set_trace()
-
-    left = pygame.Surface((out_circle_r*2, out_circle_r*2), pygame.SRCALPHA)
-    pygame.gfxdraw.filled_circle(left, out_circle_r, out_circle_r, out_circle_r, RED)
-    screen.blit(left, (200, 200))
-
-    right = pygame.Surface((out_circle_r*2, out_circle_r*2), pygame.SRCALPHA)
-    pygame.gfxdraw.filled_circle(right, out_circle_r, out_circle_r, out_circle_r, GREEN)
-    screen.blit(right, (250, 200))
+    # plane = pygame.Surface((out_circle_r*4, out_circle_r*3))
+    # plane.fill(GRAY)
 
 
-    # pygame.gfxdraw.aacircle(screen, self.position[0], self.position[1], self.radius, self.color)
-    # pygame.gfxdraw.filled_circle(screen, self.position[0], self.position[1], self.radius, self.color)
+    # left = pygame.Surface((out_circle_r*2, out_circle_r*2), pygame.SRCALPHA)
+    # pygame.gfxdraw.filled_circle(left, out_circle_r, out_circle_r, out_circle_r, RED)
+    # plane.blit(left, (0, 0))
 
-
-    # Lets mask one cicle out of another just for a simple test
-
-
+    # right = pygame.Surface((out_circle_r*2, out_circle_r*2), pygame.SRCALPHA)
+    # pygame.gfxdraw.filled_circle(right, out_circle_r, out_circle_r, out_circle_r, GREEN)
+    # plane.blit(right, (50, 0))
 
     combo_duration = 10
 
-    pygame.draw.rect(screen, RED, (start_x, 100, step_size, 10), 0)
 
 booms = []
 last_change = 0
 key_count = 0
 
 timer_start = current_time()
+
 
 while 1:
     time.sleep(0.01)
