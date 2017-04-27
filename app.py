@@ -17,7 +17,7 @@ subprocess.call(["sudo", "{}/keylogger/start.sh".format(root_path())])
 
 pygame.init()
 
-WIDTH = 800
+WIDTH = 600
 HEIGHT = 400
 
 size = (WIDTH, HEIGHT)
@@ -28,7 +28,8 @@ BLACK = (0, 0, 0)
 red_half_visible = (255, 0, 0, 0)
 GRAY=(125, 125, 125)
 GREEN=(0,100,0)
-
+WHITE=(255,255,255)
+BLUE=(0,0,255)
 # KEYBOARD KEYS
 Q_KEY = 113
 F_KEY = 102
@@ -149,6 +150,9 @@ def current_time():
 pie_start = 0
 
 
+# TODO:
+#   - Refactor this mess into Pie module with configurable radius and inner circle hole
+#   - Add anti-aliasing for inner and outter circles
 def fill_arc(surface, center, radius, theta0, theta1, color, ndiv=5):
     x0, y0 = center
 
@@ -157,7 +161,7 @@ def fill_arc(surface, center, radius, theta0, theta1, color, ndiv=5):
 
     points = [(x0 + radius * math.cos(math.radians(theta)), y0 - radius * math.sin(math.radians(theta))) for theta in angles]
     for pair in points:
-        pygame.draw.line(surface, RED, (x0, y0),(int(pair[0]), int(pair[1])), 3)
+        pygame.draw.line(surface, color, (x0, y0),(int(pair[0]), int(pair[1])), 3)
 
     # To smooth the endge of the pie, draw aaline at the place of the last few points(reduced)
     # pygame.draw.aaline(surface, RED, (x0, y0), (points[-1][0], points[-1][1]), 1)
@@ -171,36 +175,67 @@ def render_filled_pie(surface, center, radius, value, color):
     start_angle = 90
     max_angle = 360
 
-    # pdb.set_trace()
-    # print(int(value))
-
     value_angle = start_angle + (value * max_angle/max_value)
 
     fill_arc(surface, center, radius, start_angle, value_angle, color, int(value) * 5)
+
+
+def filled_pie(radius, value, color):
+    surface = pygame.Surface((radius*2, radius*2)).convert()
+    surface.fill(BLACK)
+    render_filled_pie(surface, (radius, radius), radius, value, color)
+    #
+    out_hole = pygame.Surface((radius * 2, radius * 2)).convert()
+    out_hole.fill(BLACK)
+    pygame.gfxdraw.filled_circle(out_hole, radius, radius, 90, WHITE)
+    # pygame.gfxdraw.aacircle(out_hole, radius, radius, 90, WHITE)
+
+    out_hole.set_colorkey(WHITE)
+
+    pygame.gfxdraw.filled_circle(surface, radius, radius, 80, BLACK)
+
+    surface.blit(out_hole, (0,0))
+
+    return surface
 
 def render_combo_timer(start_timestamp):
     seconds = (current_time() - start_timestamp)/1000
 
     max_width = 360
     step_size = max_width - (seconds)*100
-    radial_step_size = (seconds * 50)
+    radial_value = 100 - (seconds * 20)
+
+    # pie = render_filled_pie( screen, (200,200), 100, radial_step_size, RED )
+    pie = filled_pie(100, radial_value, WHITE)
+    pie.set_colorkey(BLACK)
 
     # pdb.set_trace()
 
-    render_filled_pie( screen, (200,200), 100, radial_step_size, RED )
+    pie_position = (
+        screen.get_width()/2 - pie.get_width() / 2,
+        screen.get_height()/2 - pie.get_height() / 2
+    )
+
+    screen.blit(pie, pie_position)
 
     if step_size < 1:
         return
 
     start_x = 10
 
-    out_circle_x = 200
-    out_circle_y = 200
-    out_circle_r = 50
+    # Grave yard of pygame examples, remove later
+    #
+    # pie_surface = pygame.Surface((100, 100)).convert()
+    # # pie_surface.set_colorkey(GREEN)
+    # pie_surface.fill(BLACK)
+    # pygame.draw.ellipse(pie_surface, GREEN, pygame.Rect((0,0), (100, 100)))
+    #
+    # # screen.blit(self.background, (0, 0))
+    # screen.blit(pie_surface, (150, 150))
+
 
     # plane = pygame.Surface((out_circle_r*4, out_circle_r*3))
     # plane.fill(GRAY)
-
 
     # left = pygame.Surface((out_circle_r*2, out_circle_r*2), pygame.SRCALPHA)
     # pygame.gfxdraw.filled_circle(left, out_circle_r, out_circle_r, out_circle_r, RED)
