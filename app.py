@@ -152,16 +152,26 @@ def render_keyboard_input_counter(key_count):
 # TODO: params should be sourface, position, font-size
 def render_combo_counter(key_count):
     myfont = pygame.font.Font(root_path() + '/assets/bignoodletoo.ttf', 110)
-    key_count_label = "{:,}".format(key_count)
+    key_count_str = "{:,}".format(key_count)
 
-    label = myfont.render(key_count_label, 1, (255,255,255))
+    key_count_label = myfont.render(key_count_str, 1, (255,255,255))
 
-    combo_label_position = (
-        screen.get_width() / 2 - label.get_width() / 2,
-        screen.get_height() / 2 - label.get_height() / 2
+    key_count_label_position = (
+        screen.get_width() / 2 - key_count_label.get_width() / 2,
+        screen.get_height() / 2 - key_count_label.get_height() / 2
     )
 
-    screen.blit(label, combo_label_position)
+    screen.blit(key_count_label, key_count_label_position)
+
+    combo_label_font = pygame.font.Font(root_path() + '/assets/bignoodletoo.ttf', 50)
+    combo_label = combo_label_font.render("COMBO!", 1, (255, 255, 255))
+
+    combo_label_position = (
+        screen.get_width() / 2 - combo_label.get_width() / 2,
+        screen.get_height() / 2 - combo_label.get_height() / 2 + 120
+    )
+
+    screen.blit(combo_label, combo_label_position)
 
 
 def current_time():
