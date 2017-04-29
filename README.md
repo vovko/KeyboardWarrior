@@ -2,7 +2,7 @@
 
 Status: *WORK IN PROGRESS* (red explosions)
 
-![keyboard_warrior_radial_progress_bar](http://i.imgur.com/vD7Ifcy.gif)
+![keyboard_warrior_combo counter](http://i.imgur.com/YtH2Kij.gif)
 
 This project is a visual presentation of your keyboard performance, similarly to http://codeinthedark.com/editor/, Keyboard Warrior counts your keystrokes, time difference in between key presses, combo hits and time since last keyboard activity.
 
