@@ -30,9 +30,13 @@ GRAY=(125, 125, 125)
 GREEN=(0,100,0)
 WHITE=(255,255,255)
 BLUE=(0,0,255)
+
 # KEYBOARD KEYS
 Q_KEY = 113
 F_KEY = 102
+
+COMBO_KEY_THRESHOLD = 10
+COMBO_TIME_THRESHOLD = 5.0 #seconds
 
 screen = pygame.display.set_mode(size, pygame.RESIZABLE)
 # screen = pygame.display.set_mode(size)
@@ -144,6 +148,22 @@ def render_keyboard_input_counter(key_count):
     label = myfont.render(key_count_label, 1, (255,255,255))
     screen.blit(label, (10, 60))
 
+
+# TODO: params should be sourface, position, font-size
+def render_combo_counter(key_count):
+    myfont = pygame.font.Font(root_path() + '/assets/bignoodletoo.ttf', 110)
+    key_count_label = "{:,}".format(key_count)
+
+    label = myfont.render(key_count_label, 1, (255,255,255))
+
+    combo_label_position = (
+        screen.get_width() / 2 - label.get_width() / 2,
+        screen.get_height() / 2 - label.get_height() / 2
+    )
+
+    screen.blit(label, combo_label_position)
+
+
 def current_time():
     return round(time.time() * 1000)
 
@@ -198,18 +218,14 @@ def filled_pie(radius, value, color):
 
     return surface
 
-def render_combo_timer(start_timestamp):
+def render_combo_progress(start_timestamp, max_time = COMBO_TIME_THRESHOLD):
     seconds = (current_time() - start_timestamp)/1000
 
-    max_width = 360
-    step_size = max_width - (seconds)*100
-    radial_value = 100 - (seconds * 20)
+    value = (100 * seconds)/max_time
+    reverse_value = 100 - value
 
-    # pie = render_filled_pie( screen, (200,200), 100, radial_step_size, RED )
-    pie = filled_pie(100, radial_value, WHITE)
+    pie = filled_pie(100, reverse_value, WHITE)
     pie.set_colorkey(BLACK)
-
-    # pdb.set_trace()
 
     pie_position = (
         screen.get_width()/2 - pie.get_width() / 2,
@@ -218,10 +234,7 @@ def render_combo_timer(start_timestamp):
 
     screen.blit(pie, pie_position)
 
-    if step_size < 1:
-        return
 
-    start_x = 10
 
     # Grave yard of pygame examples, remove later
     #
@@ -245,12 +258,16 @@ def render_combo_timer(start_timestamp):
     # pygame.gfxdraw.filled_circle(right, out_circle_r, out_circle_r, out_circle_r, GREEN)
     # plane.blit(right, (50, 0))
 
-    combo_duration = 10
+
 
 
 booms = []
 last_change = 0
 key_count = 0
+
+
+combo_key_count = 0
+combo_start = current_time()
 
 timer_start = current_time()
 
@@ -262,9 +279,9 @@ while 1:
             if event.key == Q_KEY:
                 sys.exit()
 
-            # Fullscreen acts strange in Ubuntu
-            # if event.key == F_KEY:
-            #     pygame.display.toggle_fullscreen()
+                # Fullscreen acts strange in Ubuntu
+                # if event.key == F_KEY:
+                #     pygame.display.toggle_fullscreen()
 
 
         if event.type == pygame.QUIT: sys.exit()
@@ -276,15 +293,30 @@ while 1:
 
     file_change = read_changes_from_log()
 
+    # ABSOLUTE KEY PRESS, THIS IS MAIN BRAIN
     if (file_change > last_change):
         key_count += 1
         booms.append(Boom(screen, (int(random.uniform(0, WIDTH)), int(random.uniform(0, HEIGHT)))))
         timer_start = current_time()
+        combo_key_count += 1
+
+    # OMG THIS IS A MESS I NEED OT REFACTOR THIS ASAP
+    # TODO: same time_diff is calculated in render method, refactor this
+    time_diff = (current_time() - timer_start) / 1000
+    if combo_key_count > COMBO_KEY_THRESHOLD and time_diff <= COMBO_TIME_THRESHOLD:
+        # Tracking keys for combo
+        # combo_key_count += 1
+        # if combo_key_count
+        render_combo_counter(combo_key_count)
+        render_combo_progress(timer_start)
+
+
+    print(time_diff)
+    if time_diff > COMBO_TIME_THRESHOLD:
+        combo_key_count = 0
 
     render_last_keyboard_input(timer_start)
     render_keyboard_input_counter(key_count)
-    render_combo_timer(timer_start)
-
 
     for i, boom in enumerate(booms):
         if boom.running == False:
