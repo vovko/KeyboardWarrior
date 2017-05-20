@@ -195,7 +195,7 @@ while 1:
         if event.type == pygame.QUIT: sys.exit()
 
     clock.tick()
-    screen.fill(GRAY)
+    screen.fill(BLACK)
 
     show_frame_rate(clock.get_fps())
 
