@@ -1,4 +1,4 @@
-from constants import *
+from modules.common_constants import *
 import time
 import random
 import pygame

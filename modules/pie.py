@@ -2,7 +2,7 @@ import pdb
 import pygame
 import math
 
-from constants import *
+from modules.common_constants import *
 
 class Pie:
     MAX_VALUE = 100
@@ -54,7 +54,7 @@ class Pie:
         out_hole = pygame.Surface((self.__width, self.__height)).convert()
         out_hole.fill(self.key_color)
 
-        pygame.gfxdraw.filled_circle(out_hole, self.__centre_pos()[0], self.__centre_pos()[1], self.radius-2, RED)
+        pygame.gfxdraw.filled_circle(out_hole, int(self.__centre_pos()[0]), int(self.__centre_pos()[1]), int(self.radius-2), RED)
         # pygame.gfxdraw.aacircle(out_hole, radius, radius, 90, WHITE)
         out_hole.set_colorkey(RED)
 

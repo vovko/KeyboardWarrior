@@ -25,8 +25,8 @@ size = (WIDTH, HEIGHT)
 
 red_half_visible = (255, 0, 0, 0)
 
-COMBO_KEY_THRESHOLD = 200
-COMBO_TIME_THRESHOLD = 5.0 #seconds
+COMBO_KEY_THRESHOLD = 50
+COMBO_TIME_THRESHOLD = 10.0 #seconds
 
 screen = pygame.display.set_mode(size, pygame.RESIZABLE)
 # screen = pygame.display.set_mode(size)
@@ -197,14 +197,14 @@ while 1:
     clock.tick()
     screen.fill(BLACK)
 
-    show_frame_rate(clock.get_fps())
+    #show_frame_rate(clock.get_fps())
 
     file_change = read_changes_from_log()
 
     # ABSOLUTE KEY PRESS, THIS IS MAIN BRAIN
     if (file_change > last_change):
         key_count += 1
-        booms.append(Boom(screen, (int(random.uniform(0, WIDTH)), int(random.uniform(0, HEIGHT)))))
+        # booms.append(Boom(screen, (int(random.uniform(0, WIDTH)), int(random.uniform(0, HEIGHT)))))
         timer_start = current_time()
         combo_key_count += 1
 
@@ -224,12 +224,12 @@ while 1:
     render_last_keyboard_input(timer_start)
     render_keyboard_input_counter(key_count)
 
-    for i, boom in enumerate(booms):
-        if boom.running == False:
-            del booms[i]
-            continue
-
-        boom.render()
+    # for i, boom in enumerate(booms):
+    #     if boom.running == False:
+    #         del booms[i]
+    #         continue
+    #
+    #     boom.render()
 
     last_change = file_change
     pygame.display.flip()
