@@ -17,8 +17,9 @@ class Pie:
 
     surface = None
 
-    def __init__(self, radius, value, color, key_color):
+    def __init__(self, radius, hole_radius, value, color, key_color):
         self.radius = radius
+        self.hole_radius = hole_radius
         self.value = value
         self.color = color
         self.key_color = key_color
@@ -61,7 +62,7 @@ class Pie:
         self.surface.blit(out_hole, (0, 0))
 
         # Fill inside of a pie with self.key_color circle
-        pygame.gfxdraw.filled_circle(self.surface, self.radius, self.radius, 80, self.key_color)
+        pygame.gfxdraw.filled_circle(self.surface, self.radius, self.radius, self.hole_radius, self.key_color)
 
         return self.surface
 

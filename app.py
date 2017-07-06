@@ -18,7 +18,7 @@ subprocess.call(["sudo", "{}/keylogger/start.sh".format(root_path())])
 
 pygame.init()
 
-WIDTH = 600
+WIDTH = 900
 HEIGHT = 400
 
 size = (WIDTH, HEIGHT)
@@ -97,24 +97,36 @@ def render_keyboard_input_counter(key_count):
 
 # TODO: params should be sourface, position, font-size
 def render_combo_counter(key_count):
-    myfont = pygame.font.Font(root_path() + '/assets/bignoodletoo.ttf', 110)
-    key_count_str = "{:,}".format(key_count)
+    # pdb.set_trace()
+
+    if bool(random.getrandbits(1)):
+        shake_step = 4
+    else:
+        shake_step = 0
+
+
+
+    x = 620 + random.uniform(-shake_step, shake_step)
+    y = 50 + random.uniform(-shake_step, shake_step)
+
+    myfont = pygame.font.Font(root_path() + '/assets/bignoodletoo.ttf', 40)
+    key_count_str = "{:,}".format(key_count+1000)
 
     key_count_label = myfont.render(key_count_str, 1, (255,255,255))
 
     key_count_label_position = (
-        screen.get_width() / 2 - key_count_label.get_width() / 2,
-        screen.get_height() / 2 - key_count_label.get_height() / 2
+        x - key_count_label.get_width() / 2,
+        y - key_count_label.get_height() / 2
     )
 
     screen.blit(key_count_label, key_count_label_position)
 
-    combo_label_font = pygame.font.Font(root_path() + '/assets/bignoodletoo.ttf', 50)
+    combo_label_font = pygame.font.Font(root_path() + '/assets/bignoodletoo.ttf', 40)
     combo_label = combo_label_font.render("COMBO!", 1, (255, 255, 255))
 
     combo_label_position = (
-        screen.get_width() / 2 - combo_label.get_width() / 2,
-        screen.get_height() / 2 - combo_label.get_height() / 2 + 120
+        670 + random.uniform(-shake_step,shake_step),
+        33 + random.uniform(-shake_step,shake_step)
     )
 
     screen.blit(combo_label, combo_label_position)
@@ -131,15 +143,12 @@ def render_combo_progress(start_timestamp, max_time = COMBO_TIME_THRESHOLD):
     value = (100 * seconds)/max_time
     reverse_value = 100 - value
 
-    pie = Pie(100, reverse_value, WHITE, BLACK).to_surface() # radius, value, color, key_color
+    pie = Pie(40, 32, reverse_value, WHITE, BLACK).to_surface() # radius, value, color, key_color
 
     # pie = filled_pie(100, reverse_value, WHITE)
     pie.set_colorkey(BLACK)
 
-    pie_position = (
-        screen.get_width()/2 - pie.get_width() / 2,
-        screen.get_height()/2 - pie.get_height() / 2
-    )
+    pie_position = (580, 12)
 
     screen.blit(pie, pie_position)
 
