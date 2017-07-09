@@ -6,6 +6,8 @@ import time
 import random
 import subprocess
 import math
+import logging
+import json
 
 from pygame import gfxdraw
 
@@ -25,8 +27,8 @@ size = (WIDTH, HEIGHT)
 
 red_half_visible = (255, 0, 0, 0)
 
-COMBO_KEY_THRESHOLD = 50
-COMBO_TIME_THRESHOLD = 10.0 #seconds
+COMBO_KEY_THRESHOLD = 150
+COMBO_TIME_THRESHOLD = 15.0 #seconds
 
 screen = pygame.display.set_mode(size, pygame.RESIZABLE)
 # screen = pygame.display.set_mode(size)
@@ -177,9 +179,35 @@ def render_combo_progress(start_timestamp, max_time = COMBO_TIME_THRESHOLD):
     # plane.blit(right, (50, 0))
 
 
+def getLogger(name = 'untitled'):
+  logger = logging.getLogger(name)
+  logger.setLevel(logging.INFO)
+
+  formatter = logging.Formatter('%(asctime)s,%(message)s', datefmt='%Y-%m-%d %H:%M:%S')
 
 
-booms = []
+  stdout_handler = logging.StreamHandler()
+  stdout_handler.setLevel(logging.INFO)
+  stdout_handler.setFormatter(formatter)
+
+  file_handler = logging.FileHandler('log/{}.log'.format(name))
+  file_handler.setFormatter(formatter)
+  file_handler.setLevel(logging.INFO)
+
+  logger.addHandler(stdout_handler)
+  logger.addHandler(file_handler)
+
+  return logger
+
+def write_log(logfile = "log/app.log"):
+    logger = getLogger("app")
+    record = json.dumps({
+        "key_count": key_count,
+        "start_time": start_time,
+        "end_time": current_time()
+    })
+    logger.info(record)
+
 last_change = 0
 key_count = 0
 
@@ -189,12 +217,15 @@ combo_start = current_time()
 
 timer_start = current_time()
 
+start_time = current_time()
+
 
 while 1:
     time.sleep(0.01)
     for event in pygame.event.get():
         if event.type == pygame.KEYUP:
             if event.key == Q_KEY:
+                write_log()
                 sys.exit()
 
                 # Fullscreen acts strange in Ubuntu
